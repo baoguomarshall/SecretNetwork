@@ -180,7 +180,8 @@ pub unsafe extern "C" fn ecall_authenticate_new_node(
                     return NodeAuthResult::InvalidInput;
                 }
 
-                if let Some(machine_id_hash) = verified_quote.machine_id_hash {
+                if verified_quote.machine_known && verified_quote.machine_id_hash.is_some() {
+                    let machine_id_hash = verified_quote.machine_id_hash.unwrap();
                     // handle changes to the SGX allow-list
                     let mut allow_list = crate::registration::attestation::PPID_WHITELIST
                         .lock()

@@ -824,6 +824,8 @@ pub struct VerifiedSgxQuote {
     pub body: sgx_report_body_t,
     pub qv_result: sgx_ql_qv_result_t,
     pub machine_id_hash: Option<allow_list::MachineID>,
+    pub jwt_token_valid: bool,
+    pub machine_known: bool,
 }
 
 pub fn verify_quote_sgx(
@@ -865,7 +867,7 @@ pub fn verify_quote_sgx(
                 None
             };
 
-            let is_in_wl = match &machine_id_to_check {
+            let machine_known = match &machine_id_to_check {
                 Some(machine_id_hash) => {
                     let wl = PPID_WHITELIST.lock().unwrap();
                     wl.m_to_o.contains_key(machine_id_hash)
@@ -886,7 +888,7 @@ pub fn verify_quote_sgx(
                 true
             };
 
-            if check_ppid_wl && (!is_in_wl && !jwt_token_valid) {
+            if check_ppid_wl && (!machine_known && !jwt_token_valid) {
                 println!("This machine is not known, and doesn't present a valid JWT token. The machine cannot join the network.");
                 return Err(sgx_status_t::SGX_ERROR_UNEXPECTED);
             }
@@ -895,6 +897,8 @@ pub fn verify_quote_sgx(
                 body: (*my_p_quote).report_body,
                 qv_result,
                 machine_id_hash: machine_id_opt,
+                jwt_token_valid,
+                machine_known,
             })
         }
     }
