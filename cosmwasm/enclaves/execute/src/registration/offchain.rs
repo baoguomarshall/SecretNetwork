@@ -792,6 +792,10 @@ fn is_msg_machine_id(msg_in_block: &[u8], machine_id: &[u8]) -> bool {
     }
 
     if let Some(x) = r.read_uint() {
+        if x > r.cursor.len() {
+            trace!("malformed field");
+            return false;
+        }
         r.cursor = &r.cursor[0..x];
     } else {
         trace!("wrong sub6");
