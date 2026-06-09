@@ -2,6 +2,7 @@ use cosmos_proto::tx::tx::Tx;
 use enclave_crypto::sha_256;
 use log::error;
 use protobuf::Message;
+use protobuf::ProtobufResult;
 use sgx_types::sgx_status_t;
 use sgx_types::SgxResult;
 use tendermint::block::Data;
@@ -19,10 +20,8 @@ pub fn txs_from_bytes(raw_txs: &[u8]) -> SgxResult<Vec<Vec<u8>>> {
     Ok(item_array.txs)
 }
 
-pub fn tx_from_bytes(raw_tx: &[u8]) -> SgxResult<Tx> {
-    let res = Tx::parse_from_bytes(raw_tx).unwrap();
-
-    Ok(res)
+pub fn tx_from_bytes(raw_tx: &[u8]) -> ProtobufResult<Tx> {
+    Tx::parse_from_bytes(raw_tx)
 }
 
 pub fn txs_hash(txs: &Vec<Vec<u8>>) -> [u8; 32] {
